@@ -1,0 +1,102 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+.form-wrapper {
+  display: flex;
+  justify-content: center;
+}
+#form-input {
+  padding: 2px 5px;
+  width: 240px;
+  height: 20px;
+}
+.btn {
+
+  text-decoration: none;
+  color: #6b5770;
+  background-image: linear-gradient(90deg, #fd7f34, #bd155b);
+  display: inline-block;
+  padding: 5px 10px;
+  border: 1px solid;
+  position: relative;
+  z-index: 0;
+  border-radius: 5px;
+  box-sizing: border-box;
+  margin: 0 15px 15px 5px;
+  outline: none;
+  cursor: pointer;
+  user-select: none;
+  appearance: none;
+  touch-action: manipulation;
+}
+.btn:before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  background: linear-gradient(90deg, #fd7f34, #bd155b);
+  z-index: -2;
+  transition: .4s;
+  border-radius: 5px;
+}
+.btn:after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #fff, #fff);
+  z-index: -1;
+  transition: .4s;
+  border-radius: 4px;
+}
+.btn:hover {
+  color: #fff;
+  transition: .3s;
+}
+.btn:hover:after {
+  background: linear-gradient(90deg, #fd7f34, #bd155b);
+}
+.btn:active:after {
+  background: linear-gradient(90deg, #d96d2d, #760f3a);
+}
+.btn:focus-visible {
+  box-shadow: 0 0 0 3px #fd7f34;
+}
+.btn:disabled {
+  pointer-events: none;
+}
+.btn:disabled:before {
+  filter: grayscale(100%);
+}
+
+.tasks-wrapper {
+  margin: 0 auto;
+  width: 45%;
+}
+.task {
+  background: #f5f3d0;
+  margin: 10px 0;
+  padding: 10px 20px;
+  border: 1px solid lightsteelblue;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.delete-btn {
+  width: 30px;
+  height: 30px;
+  background: url("src/icons/delete-icon.png") center center no-repeat;
+  background-size: cover;
+  border-radius: 8px;
+  border: 1.5px solid darkred;
+}
+.delete-btn:hover {
+  border: 2.5px solid brown;
+}
