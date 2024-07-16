@@ -1,39 +1,45 @@
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
+import axiosApi from '../../axiosApi';
 import {Task, TaskApi, TasksApi} from '../../types';
 import {RootState} from '../../app/store';
-import axiosApi from '../../axiosApi';
 
 interface TodoListState {
-  tasks: Task[] | null;
-  task: TaskApi | null
+  tasks: Task[];
+  task: TaskApi | null;
   inputValue: string;
   isLoading: boolean;
   isError: boolean;
 }
 
 const initialState: TodoListState = {
-  tasks: null,
+  tasks: [],
   task: null,
   inputValue: '',
   isLoading: false,
   isError: false,
 };
 
-export const fetchTasks = createAsyncThunk('todolist/fetchTasks', async (_arg, thunkAPI) => {
-  const { data: tasks } = await axiosApi.get<TasksApi | null>('/tasks.json');
-  const state = thunkAPI.getState().todolist;
-  if (tasks !== null) {
-    state.tasks = Object.keys(tasks).map((id: string) => {
-      return {
-        ...tasks[id],
-        id: id
-      };
-    });
+export const fetchTasks = createAsyncThunk<Task[], void, { state: RootState }>(
+  'todolist/fetchTasks',
+  async (_arg, {rejectWithValue}) => {
+    try {
+      const {data: tasks} = await axiosApi.get<TasksApi | null>('/tasks.json');
+      if (tasks !== null) {
+        return Object.keys(tasks).map((id) => ({
+          ...tasks[id],
+          id: id
+        }));
+      }
+      return [];
+    } catch (error) {
+      return rejectWithValue('Failed to fetch tasks');
+    }
   }
-  console.log(tasks);
-  return tasks || null;
-});
-export const fetchPostTask = createAsyncThunk<void, void, { state: RootState }>('todolist/fetchPostTask', async (_arg, thunkAPI) => {
+);
+
+export const fetchPostTask = createAsyncThunk<void, void, {
+  state: RootState
+}>('todolist/fetchPostTask', async (_arg, thunkAPI) => {
   const taskValue = thunkAPI.getState().todolist.inputValue;
   const task: TaskApi = {
     title: taskValue,
@@ -41,6 +47,15 @@ export const fetchPostTask = createAsyncThunk<void, void, { state: RootState }>(
   };
 
   await axiosApi.post<TaskApi>('/tasks.json', task);
+});
+
+export const fetchChangeTaskStatus = createAsyncThunk('todolist/fetchChangeTaskStatus', async (argTask) => {
+  console.log(!argTask.status);
+  const newTask: TaskApi = {
+    title: argTask.title,
+    status: !argTask.status
+  };
+  await axiosApi.put(`/tasks/${argTask.id}.json`, newTask);
 });
 
 export const TodoListSlice = createSlice({
@@ -55,13 +70,38 @@ export const TodoListSlice = createSlice({
     builder.addCase(fetchPostTask.pending, (state) => {
       state.isError = false;
       state.isLoading = true;
-
     })
       .addCase(fetchPostTask.fulfilled, (state) => {
-        state.isLoading = true;
+        state.isLoading = false;
         state.inputValue = '';
       })
       .addCase(fetchPostTask.rejected, (state) => {
+        state.isLoading = false;
+        state.isError = true;
+      })
+      .addCase(fetchTasks.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+      })
+      .addCase(fetchTasks.fulfilled, (state, action: PayloadAction<Task[]>) => {
+        state.isLoading = false;
+        state.tasks = action.payload;
+        // console.log(action.payload);
+        // console.log(action);
+      })
+      .addCase(fetchTasks.rejected, (state) => {
+        state.isLoading = false;
+        state.isError = true;
+      });
+    builder
+      .addCase(fetchChangeTaskStatus.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+      })
+      .addCase(fetchChangeTaskStatus.fulfilled, (state) => {
+        state.isLoading = false;
+      })
+      .addCase(fetchChangeTaskStatus.rejected, (state) => {
         state.isLoading = false;
         state.isError = true;
       });
