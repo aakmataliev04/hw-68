@@ -13,12 +13,12 @@ const Task: React.FC<PropsTask> = ({task, onChangeTaskStatus, onDeleteTask}) => 
   const [isDeleting, setIsDeleting] = useState(false);
   const [isChangingStatus, setIsChangingStatus] = useState(false);
   const deleteTask = async (onDeleteTask) => {
-   try {
-     setIsDeleting(true);
-     await onDeleteTask(task);
-   } finally {
-     setIsDeleting(false);
-   }
+    try {
+      setIsDeleting(true);
+      await onDeleteTask(task);
+    } finally {
+      setIsDeleting(false);
+    }
   };
   const changeStatus = async (onChangeTaskStatus) => {
     try {
@@ -32,7 +32,8 @@ const Task: React.FC<PropsTask> = ({task, onChangeTaskStatus, onDeleteTask}) => 
     <div className={'task'}>
       <div className={'task-left-box'}>
         <div className="checkbox-wrapper-31">
-          <input type="checkbox" onChange={() => changeStatus(onChangeTaskStatus)} checked={task.status} disabled={isChangingStatus}/>
+          <input type="checkbox" onChange={() => changeStatus(onChangeTaskStatus)} checked={task.status}
+                 disabled={isChangingStatus}/>
           <svg viewBox="0 0 35.6 35.6">
             <circle className="background" cx="17.8" cy="17.8" r="17.8"></circle>
             <circle className="stroke" cx="17.8" cy="17.8" r="14.37"></circle>

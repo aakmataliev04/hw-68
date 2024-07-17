@@ -39,7 +39,8 @@ const TodoList = () => {
   });
   return (
     <>
-      <AddTaskForm inputValue={inputValue} onChangeValue={(event) => dispatch(changeInputValue(event.target.value))} onSubmit={(event) => postTask(event)}/>
+      <AddTaskForm inputValue={inputValue} onChangeValue={(event) => dispatch(changeInputValue(event.target.value))}
+                   onSubmit={(event) => postTask(event)}/>
       <div className={'tasks-wrapper'}>
         {
           TaskList
