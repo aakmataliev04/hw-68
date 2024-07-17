@@ -2,6 +2,7 @@ import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import axiosApi from '../../axiosApi';
 import {Task, TaskApi, TasksApi} from '../../types';
 import {RootState} from '../../app/store';
+import {toast} from 'react-toastify';
 
 interface TodoListState {
   tasks: Task[];
@@ -29,8 +30,9 @@ export const fetchTasks = createAsyncThunk<Task[], void, { state: RootState }>(
           ...tasks[id],
           id: id
         }));
+      } else {
+        return [];
       }
-      return [];
     } catch (error) {
       return rejectWithValue('Failed to fetch tasks');
     }
@@ -50,12 +52,14 @@ export const fetchPostTask = createAsyncThunk<void, void, {
 });
 
 export const fetchChangeTaskStatus = createAsyncThunk('todolist/fetchChangeTaskStatus', async (argTask) => {
-  console.log(!argTask.status);
   const newTask: TaskApi = {
     title: argTask.title,
     status: !argTask.status
   };
   await axiosApi.put(`/tasks/${argTask.id}.json`, newTask);
+});
+export const fetchDeleteTask = createAsyncThunk('todolist/fetchDeleteTask', async (argTask) => {
+  await axiosApi.delete(`/tasks/${argTask.id}.json`);
 });
 
 export const TodoListSlice = createSlice({
@@ -78,7 +82,8 @@ export const TodoListSlice = createSlice({
       .addCase(fetchPostTask.rejected, (state) => {
         state.isLoading = false;
         state.isError = true;
-      })
+      });
+    builder
       .addCase(fetchTasks.pending, (state) => {
         state.isLoading = true;
         state.isError = false;
@@ -86,12 +91,11 @@ export const TodoListSlice = createSlice({
       .addCase(fetchTasks.fulfilled, (state, action: PayloadAction<Task[]>) => {
         state.isLoading = false;
         state.tasks = action.payload;
-        // console.log(action.payload);
-        // console.log(action);
       })
       .addCase(fetchTasks.rejected, (state) => {
         state.isLoading = false;
         state.isError = true;
+        toast.error('Connection or API Error!', {theme: 'dark'});
       });
     builder
       .addCase(fetchChangeTaskStatus.pending, (state) => {
@@ -104,6 +108,20 @@ export const TodoListSlice = createSlice({
       .addCase(fetchChangeTaskStatus.rejected, (state) => {
         state.isLoading = false;
         state.isError = true;
+      });
+    builder
+      .addCase(fetchDeleteTask.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+      })
+      .addCase(fetchDeleteTask.fulfilled, (state) => {
+        state.isLoading = false;
+        toast.success('Task deleted!', {theme: 'dark'});
+      })
+      .addCase(fetchDeleteTask.rejected, (state) => {
+        state.isLoading = false;
+        state.isError = true;
+        toast.error('Task is not deleted!', {theme: 'dark'});
       });
   }
 });
